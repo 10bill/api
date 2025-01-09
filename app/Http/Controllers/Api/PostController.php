@@ -11,8 +11,26 @@ use App\Models\Post;
 use Exception;
 use GuzzleHttp\Promise\Create;
 
+
+
 class PostController extends Controller
 {
+    /**
+ * @OA\Get(
+ *     path="/api/posts",
+ *     tags={"Posts"},
+ *     summary="Récupérer toutes les publications",
+ *     description="Retourne une liste des publications",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Succès",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/Post")
+ *         )
+ *     )
+ * )
+ */
     // Liste des posts
     public function index(Request $request)
     {

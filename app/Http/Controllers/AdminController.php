@@ -9,6 +9,33 @@ use Illuminate\Support\Facades\Hash;
 class AdminController extends Controller
 {
 
+    /**
+ * @OA\Post(
+ *     path="/api/admin/create",
+ *     summary="Créer un administrateur",
+ *     description="Permet à un super_admin de créer un administrateur.",
+ *     tags={"Admin"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", example="Admin Example"),
+ *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
+ *             @OA\Property(property="password", type="string", format="password", example="password123")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Administrateur créé avec succès.",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Nouvel administrateur créé avec succès."),
+ *             @OA\Property(property="admin", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(response=403, description="Accès non autorisé."),
+ *     security={{"bearerAuth": {}}}
+ * )
+ */
+
     public function promoteToSuperAdmin(Request $request, $id)
 {
     $currentUser = auth()->user();
@@ -28,6 +55,8 @@ class AdminController extends Controller
 
     return response()->json(['message' => 'Administrateur promu au rôle de super_admin avec succès.'], 200);
 }
+
+
 
 public function createAdmin(Request $request)
 {

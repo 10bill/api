@@ -6,6 +6,29 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * @OA\Info(
+ *     title="API gestion de post",
+ *     version="1.0.0",
+ *     description="API pour la gestion des utilisateurs et des posts.",
+ *     @OA\Contact(
+ *         email="support@example.com"
+ *     )
+ * )
+ *
+ * @OA\Server(
+ *     url="http://localhost:8000",
+ *     description="Serveur local"
+ * )
+ *
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ */
+
 
 Route::middleware(['auth:sanctum', 'admin'])->put('/admin/promote/{id}', [AdminController::class, 'promoteToSuperAdmin']);
 
