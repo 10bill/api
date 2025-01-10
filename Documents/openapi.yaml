@@ -1,59 +1,34 @@
 openapi: 3.0.0
 info:
   title: API gestion de post
-  description: Documentation pour les différentes routes de l'API.
+  description: Documentation complète pour les utilisateurs, publications et administrateurs.
   version: 1.0.0
 servers:
   - url: http://localhost:8000
     description: Serveur local
 paths:
-  /api/register:
-    post:
-      summary: Inscription d'un utilisateur
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-      responses:
-        '201':
-          description: Utilisateur inscrit avec succès.
-        '400':
-          description: Erreur de validation.
-  /api/login:
-    post:
-      summary: Connexion d'un utilisateur
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
+  /api/users:
+    get:
+      summary: Récupérer la liste des utilisateurs
+      tags:
+        - Utilisateurs
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: Connexion réussie.
+          description: Liste des utilisateurs récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         '401':
-          description: Identifiants invalides.
-  /api/posts/create:
+          description: Non autorisé.
     post:
-      summary: Création d'un post
+      summary: Ajouter un utilisateur
+      tags:
+        - Utilisateurs
       security:
         - bearerAuth: []
       requestBody:
@@ -61,20 +36,42 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                titre:
-                  type: string
-                description:
-                  type: string
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
-          description: Post créé avec succès.
+          description: Utilisateur ajouté avec succès.
+        '400':
+          description: Erreur de validation.
         '401':
           description: Non autorisé.
-  /api/posts/edit/{id}:
+  /api/users/{id}:
+    get:
+      summary: Récupérer un utilisateur par ID
+      tags:
+        - Utilisateurs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Utilisateur récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Utilisateur non trouvé.
+        '401':
+          description: Non autorisé.
     put:
-      summary: Modifier un post
+      summary: Modifier un utilisateur
+      tags:
+        - Utilisateurs
       parameters:
         - name: id
           in: path
@@ -88,20 +85,111 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                titre:
-                  type: string
-                description:
-                  type: string
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Utilisateur modifié avec succès.
+        '404':
+          description: Utilisateur non trouvé.
+        '401':
+          description: Non autorisé.
+    delete:
+      summary: Supprimer un utilisateur
+      tags:
+        - Utilisateurs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Utilisateur supprimé avec succès.
+        '404':
+          description: Utilisateur non trouvé.
+        '401':
+          description: Non autorisé.
+  /api/posts:
+    get:
+      summary: Récupérer la liste des posts
+      tags:
+        - Publications
+      responses:
+        '200':
+          description: Liste des posts récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Ajouter un post
+      tags:
+        - Publications
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '201':
+          description: Post ajouté avec succès.
+        '400':
+          description: Erreur de validation.
+  /api/posts/{id}:
+    get:
+      summary: Récupérer un post par ID
+      tags:
+        - Publications
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post non trouvé.
+    put:
+      summary: Modifier un post
+      tags:
+        - Publications
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdate'
       responses:
         '200':
           description: Post modifié avec succès.
         '404':
           description: Post non trouvé.
-  /api/posts/{id}:
     delete:
       summary: Supprimer un post
+      tags:
+        - Publications
       parameters:
         - name: id
           in: path
@@ -115,162 +203,11 @@ paths:
           description: Post supprimé avec succès.
         '404':
           description: Post non trouvé.
-  /api/admin/register:
-    post:
-      summary: Inscription d'un administrateur
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-      responses:
-        '201':
-          description: Administrateur inscrit avec succès.
-  /api/admin/login:
-    post:
-      summary: Connexion d'un administrateur
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-      responses:
-        '200':
-          description: Connexion réussie.
-        '401':
-          description: Identifiants invalides.
-  /api/admin/users:
-    post:
-      summary: Ajouter un utilisateur
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-                role:
-                  type: string
-                  enum: [user, admin]
-      responses:
-        '201':
-          description: Utilisateur ajouté avec succès.
-        '400':
-          description: Erreur de validation.
-        '401':
-          description: Non autorisé.
-    get:
-      summary: Voir la liste des utilisateurs
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Liste des utilisateurs récupérée avec succès.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    name:
-                      type: string
-                    email:
-                      type: string
-                    role:
-                      type: string
-        '401':
-          description: Non autorisé.
-  /api/admin/users/{id}:
-    put:
-      summary: Modifier un utilisateur
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-                  format: password
-                role:
-                  type: string
-                  enum: [user, admin]
-      responses:
-        '200':
-          description: Utilisateur modifié avec succès.
-        '404':
-          description: Utilisateur non trouvé.
-        '401':
-          description: Non autorisé.
-    delete:
-      summary: Supprimer un utilisateur
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Utilisateur supprimé avec succès.
-        '404':
-          description: Utilisateur non trouvé.
-        '401':
-          description: Non autorisé.
   /api/admin/promote/{id}:
     put:
-      summary: Promouvoir un administrateur en super_admin
-      security:
-        - bearerAuth: []
+      summary: Promouvoir un admin en super-admin
+      tags:
+        - Administration
       parameters:
         - name: id
           in: path
@@ -278,23 +215,20 @@ paths:
           schema:
             type: integer
           description: ID de l'administrateur à promouvoir
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Administrateur promu avec succès.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
         '403':
-          description: Accès non autorisé. Seul un super_admin peut promouvoir.
+          description: Accès non autorisé.
         '404':
           description: Administrateur non trouvé.
   /api/admin/create:
     post:
       summary: Créer un nouvel administrateur
+      tags:
+        - Administration
       security:
         - bearerAuth: []
       requestBody:
@@ -302,22 +236,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Nom de l'administrateur
-                  example: Admin Example
-                email:
-                  type: string
-                  format: email
-                  description: Email de l'administrateur
-                  example: admin@example.com
-                password:
-                  type: string
-                  format: password
-                  description: Mot de passe de l'administrateur
-                  example: password123
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
           description: Nouvel administrateur créé avec succès.
@@ -329,19 +248,75 @@ paths:
                   message:
                     type: string
                   admin:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      name:
-                        type: string
-                      email:
-                        type: string
-                      role:
-                        type: string
+                    $ref: '#/components/schemas/User'
         '403':
-          description: Accès non autorisé. Seul un super_admin peut créer un admin.
+          description: Accès non autorisé.
 components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [user, admin]
+    UserCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [user, admin]
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [user, admin]
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        titre:
+          type: string
+        description:
+          type: string
+    PostCreate:
+      type: object
+      properties:
+        titre:
+          type: string
+        description:
+          type: string
+    PostUpdate:
+      type: object
+      properties:
+        titre:
+          type: string
+        description:
+          type: string
   securitySchemes:
     bearerAuth:
       type: http
