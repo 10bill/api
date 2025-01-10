@@ -1,0 +1,349 @@
+openapi: 3.0.0
+info:
+  title: API gestion de post
+  description: Documentation pour les différentes routes de l'API.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Serveur local
+paths:
+  /api/register:
+    post:
+      summary: Inscription d'un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: Utilisateur inscrit avec succès.
+        '400':
+          description: Erreur de validation.
+  /api/login:
+    post:
+      summary: Connexion d'un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Connexion réussie.
+        '401':
+          description: Identifiants invalides.
+  /api/posts/create:
+    post:
+      summary: Création d'un post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titre:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Post créé avec succès.
+        '401':
+          description: Non autorisé.
+  /api/posts/edit/{id}:
+    put:
+      summary: Modifier un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titre:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Post modifié avec succès.
+        '404':
+          description: Post non trouvé.
+  /api/posts/{id}:
+    delete:
+      summary: Supprimer un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Post supprimé avec succès.
+        '404':
+          description: Post non trouvé.
+  /api/admin/register:
+    post:
+      summary: Inscription d'un administrateur
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: Administrateur inscrit avec succès.
+  /api/admin/login:
+    post:
+      summary: Connexion d'un administrateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Connexion réussie.
+        '401':
+          description: Identifiants invalides.
+  /api/admin/users:
+    post:
+      summary: Ajouter un utilisateur
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                role:
+                  type: string
+                  enum: [user, admin]
+      responses:
+        '201':
+          description: Utilisateur ajouté avec succès.
+        '400':
+          description: Erreur de validation.
+        '401':
+          description: Non autorisé.
+    get:
+      summary: Voir la liste des utilisateurs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des utilisateurs récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    role:
+                      type: string
+        '401':
+          description: Non autorisé.
+  /api/admin/users/{id}:
+    put:
+      summary: Modifier un utilisateur
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                role:
+                  type: string
+                  enum: [user, admin]
+      responses:
+        '200':
+          description: Utilisateur modifié avec succès.
+        '404':
+          description: Utilisateur non trouvé.
+        '401':
+          description: Non autorisé.
+    delete:
+      summary: Supprimer un utilisateur
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisateur supprimé avec succès.
+        '404':
+          description: Utilisateur non trouvé.
+        '401':
+          description: Non autorisé.
+  /api/admin/promote/{id}:
+    put:
+      summary: Promouvoir un administrateur en super_admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de l'administrateur à promouvoir
+      responses:
+        '200':
+          description: Administrateur promu avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Accès non autorisé. Seul un super_admin peut promouvoir.
+        '404':
+          description: Administrateur non trouvé.
+  /api/admin/create:
+    post:
+      summary: Créer un nouvel administrateur
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nom de l'administrateur
+                  example: Admin Example
+                email:
+                  type: string
+                  format: email
+                  description: Email de l'administrateur
+                  example: admin@example.com
+                password:
+                  type: string
+                  format: password
+                  description: Mot de passe de l'administrateur
+                  example: password123
+      responses:
+        '201':
+          description: Nouvel administrateur créé avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  admin:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      role:
+                        type: string
+        '403':
+          description: Accès non autorisé. Seul un super_admin peut créer un admin.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT            dans mon api j'ai deux tables je veux que sépare et je veux voir ça aussi dans le swagger avec tous les get et requetes
